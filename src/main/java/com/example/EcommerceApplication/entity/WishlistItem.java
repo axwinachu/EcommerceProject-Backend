@@ -17,13 +17,11 @@ public class WishlistItem {
     private int id;
 
     @ManyToOne
-    @JoinColumn(name = "wishlist_id")
+    @JoinColumn(name = "wishlist_id",nullable = false)
     private Wishlist wishlist;
 
     @ManyToOne
-    @JoinColumn(name = "product_id")
+    @JoinColumn(name = "product_id",nullable = false)
     private Product product;
 
-    @Column(nullable = false)
-    private int quantity;
 }

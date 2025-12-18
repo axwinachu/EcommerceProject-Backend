@@ -14,16 +14,18 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Table(name = "wishlist")
 public class Wishlist {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     @OneToOne
+    @JoinColumn(name = "user_id",nullable = false,unique = true)
     private User user;
 
     @OneToMany(
-            mappedBy = "cart",
+            mappedBy = "wishlist",
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
