@@ -33,8 +33,10 @@ public class CartFacade {
         Cart cart=cartService.findByUser(user).orElseGet(()->cartService.save(Cart.builder().user(user).build()));
         Product product=productService.getById(productId)
                 .orElseThrow(()->new NotFoundException("Product Not Found"));
+
         CartItem cartItem=cartItemService.findByCartAndProduct(cart,product)
                 .orElse(CartItem.builder().cart(cart).product(product).quantity(0).build());
+        
         cartItem.setQuantity(cartItem.getQuantity()+1);
         cartItemService.save(cartItem);
         return new ResponseEntity<>(cartMapper.toCartDto(cart), HttpStatus.OK);
@@ -45,7 +47,7 @@ public class CartFacade {
         String email=auth.getName();
         User user=userService.getByEmail(email).orElseThrow(()->new NotFoundException("User Not Found"));
         Cart cart = cartService.findByUser(user)
-                .orElseThrow(() -> new NotFoundException("Cart not found"));
+                .orElseGet(() -> cartService.save(Cart.builder().user(user).build()));
         return new ResponseEntity<>(cartMapper.toCartDto(cart), HttpStatus.OK);
     }
 
