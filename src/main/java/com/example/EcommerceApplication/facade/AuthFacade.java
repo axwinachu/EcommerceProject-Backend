@@ -3,6 +3,7 @@ package com.example.EcommerceApplication.facade;
 import com.example.EcommerceApplication.dto.UserDto;
 import com.example.EcommerceApplication.entity.User;
 import com.example.EcommerceApplication.exception.NotFoundException;
+import com.example.EcommerceApplication.security.JwtUtil;
 import com.example.EcommerceApplication.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -10,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
 import java.util.Optional;
 
 @Component
@@ -17,14 +19,15 @@ import java.util.Optional;
 public class AuthFacade {
     private final PasswordEncoder passwordEncoder;
     private final UserService userService;
+    private final JwtUtil jwtUtil;
     public ResponseEntity<String> signup(UserDto userDto) {
         boolean existedUser=userService.existsByEmail(userDto.getEmail());
         if(existedUser){
             return new ResponseEntity<>("already have an account", HttpStatus.BAD_REQUEST);
         }
-        User newUser=User.builder().name(userDto.getName()).email(userDto.getEmail()).password(userDto.getPassword())
-                .role(userDto.getPassword()).active(userDto.isActive()).build();
-        userService.save(new User());
+        User newUser=User.builder().name(userDto.getName()).email(userDto.getEmail()).password(passwordEncoder.encode(userDto.getPassword()))
+                .role("ROLE_"+userDto.getRole().toUpperCase()).active(userDto.isActive()).build();
+        userService.save(newUser);
         return new ResponseEntity<>("User Created Successfully",HttpStatus.OK);
     }
 
@@ -36,10 +39,10 @@ public class AuthFacade {
             return new  ResponseEntity<>("user not found please signup",HttpStatus.OK);
         }
         User validateUser=userService.getByEmail(email).orElseThrow(()->new NotFoundException("invalid credential"));
-        if(!passwordEncoder.matches(validateUser.getPassword(), password)){
+        if(!passwordEncoder.matches( password,validateUser.getPassword())){
             return new ResponseEntity<>("invalid Credential",HttpStatus.OK);
         }
-
+        return new ResponseEntity<>(Map.of("token:",jwtUtil.generateToken(email,password)),HttpStatus.OK);
 
     }
 }

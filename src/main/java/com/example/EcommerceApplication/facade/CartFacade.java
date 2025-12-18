@@ -10,9 +10,12 @@ import com.example.EcommerceApplication.mapper.CartMapper;
 import com.example.EcommerceApplication.service.CartItemService;
 import com.example.EcommerceApplication.service.CartService;
 import com.example.EcommerceApplication.service.ProductService;
+import com.example.EcommerceApplication.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -22,9 +25,12 @@ public class CartFacade {
     private final CartItemService cartItemService;
     private final ProductService productService;
     private final CartMapper cartMapper;
-
+    private final UserService userService;
     public ResponseEntity<CartDto> addToCart(Long productId) {
-        Cart cart=cartService.findById(1L).orElseGet(()->cartService.save(Cart.builder().build()));
+        Authentication auth= SecurityContextHolder.getContext().getAuthentication();
+        String email=auth.getName();
+        User user=userService.getByEmail(email).orElseThrow(()->new NotFoundException("User Not Found"));
+        Cart cart=cartService.findByUser(user).orElseGet(()->cartService.save(Cart.builder().user(user).build()));
         Product product=productService.getById(productId)
                 .orElseThrow(()->new NotFoundException("Product Not Found"));
         CartItem cartItem=cartItemService.findByCartAndProduct(cart,product)
@@ -35,7 +41,10 @@ public class CartFacade {
     }
 
     public ResponseEntity<CartDto> viewCart() {
-        Cart cart = cartService.findById(1L)
+        Authentication auth= SecurityContextHolder.getContext().getAuthentication();
+        String email=auth.getName();
+        User user=userService.getByEmail(email).orElseThrow(()->new NotFoundException("User Not Found"));
+        Cart cart = cartService.findByUser(user)
                 .orElseThrow(() -> new NotFoundException("Cart not found"));
         return new ResponseEntity<>(cartMapper.toCartDto(cart), HttpStatus.OK);
     }
