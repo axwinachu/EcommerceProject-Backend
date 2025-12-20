@@ -5,10 +5,12 @@ import com.example.EcommerceApplication.dto.PlaceOrderDto;
 import com.example.EcommerceApplication.entity.*;
 import com.example.EcommerceApplication.exception.NotFoundException;
 import com.example.EcommerceApplication.mapper.OrderMapper;
+import com.example.EcommerceApplication.responsce.CartResponse;
 import com.example.EcommerceApplication.responsce.OrderStatus;
 import com.example.EcommerceApplication.service.CartService;
 import com.example.EcommerceApplication.service.OrderService;
 import com.example.EcommerceApplication.service.UserService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +31,7 @@ public class OrderFacade {
         Authentication auth= SecurityContextHolder.getContext().getAuthentication();
         return auth.getName();
     }
+    @Transactional
     public ResponseEntity<OrderDto> placeOrder(PlaceOrderDto placeOrderDto) {
 
 
@@ -41,7 +44,7 @@ public class OrderFacade {
                 .orElseThrow(()->new NotFoundException("cart is not found"));
 
         if(cart.getItems().isEmpty()){
-            throw new RuntimeException("Cart is empty");
+            throw new RuntimeException(OrderStatus.CART_IS_EMPTY.name());
         }
 
         Order order=Order.builder().user(user)
@@ -53,6 +56,13 @@ public class OrderFacade {
 
         double total=0;
         for(CartItem cartItem: cart.getItems()){
+
+            Product product=cartItem.getProduct();
+            if(product.getStock()< cartItem.getQuantity()){
+                throw new RuntimeException("Not Enough stock"+product.getName());
+            }
+            product.setStock(product.getStock()- cartItem.getQuantity());
+
             OrderItem orderItem=OrderItem.builder()
                     .order(order)
                     .product(cartItem.getProduct())

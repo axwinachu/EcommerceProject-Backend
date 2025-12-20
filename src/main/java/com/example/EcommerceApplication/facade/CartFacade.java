@@ -7,6 +7,8 @@ import com.example.EcommerceApplication.entity.Product;
 import com.example.EcommerceApplication.entity.User;
 import com.example.EcommerceApplication.exception.NotFoundException;
 import com.example.EcommerceApplication.mapper.CartMapper;
+import com.example.EcommerceApplication.responsce.AuthResponse;
+import com.example.EcommerceApplication.responsce.CartResponse;
 import com.example.EcommerceApplication.service.CartItemService;
 import com.example.EcommerceApplication.service.CartService;
 import com.example.EcommerceApplication.service.ProductService;
@@ -26,13 +28,18 @@ public class CartFacade {
     private final ProductService productService;
     private final CartMapper cartMapper;
     private final UserService userService;
+    String getUserEmail(){
+        Authentication auth= SecurityContextHolder.getContext().getAuthentication();
+        return auth.getName();
+
+    }
     public ResponseEntity<CartDto> addToCart(Long productId) {
         Authentication auth= SecurityContextHolder.getContext().getAuthentication();
         String email=auth.getName();
-        User user=userService.getByEmail(email).orElseThrow(()->new NotFoundException("User Not Found"));
+        User user=userService.getByEmail(email).orElseThrow(()->new NotFoundException(AuthResponse.USER_NOT_FOUND.name()));
         Cart cart=cartService.findByUser(user).orElseGet(()->cartService.save(Cart.builder().user(user).build()));
         Product product=productService.getById(productId)
-                .orElseThrow(()->new NotFoundException("Product Not Found"));
+                .orElseThrow(()->new NotFoundException(CartResponse.PRODUCT_NOT_FOUND.name()));
 
         CartItem cartItem=cartItemService.findByCartAndProduct(cart,product)
                 .orElse(CartItem.builder().cart(cart).product(product).quantity(0).build());
@@ -45,7 +52,7 @@ public class CartFacade {
     public ResponseEntity<CartDto> viewCart() {
         Authentication auth= SecurityContextHolder.getContext().getAuthentication();
         String email=auth.getName();
-        User user=userService.getByEmail(email).orElseThrow(()->new NotFoundException("User Not Found"));
+        User user=userService.getByEmail(email).orElseThrow(()->new NotFoundException(AuthResponse.USER_NOT_FOUND.name()));
         Cart cart = cartService.findByUser(user)
                 .orElseGet(() -> cartService.save(Cart.builder().user(user).build()));
         return new ResponseEntity<>(cartMapper.toCartDto(cart), HttpStatus.OK);
@@ -53,18 +60,19 @@ public class CartFacade {
 
     public ResponseEntity<CartDto> updateQuantity(Long productId, int quantity) {
         if (quantity < 0) {
-            throw new IllegalArgumentException("Quantity cannot be negative");
+            throw new IllegalArgumentException(CartResponse.QUANTITY_CANNOT_BE_NEGATIVE.name());
         }
-
-        Cart cart = cartService.findById(1L)
-                .orElseThrow(() -> new NotFoundException("Cart not found"));
+        String email=getUserEmail();
+        User user=userService.getByEmail(email).orElseThrow(()->new NotFoundException(AuthResponse.USER_NOT_FOUND.name()));
+        Cart cart = cartService.findByUser(user)
+                .orElseThrow(() -> new NotFoundException(CartResponse.CART_NOT_FOUND.name()));
 
         Product product = productService.getById(productId)
-                .orElseThrow(() -> new NotFoundException("Product not found"));
+                .orElseThrow(() -> new NotFoundException(CartResponse.PRODUCT_NOT_FOUND.name()));
 
         CartItem cartItem = cartItemService
                 .findByCartAndProduct(cart, product)
-                .orElseThrow(() -> new NotFoundException("Item not in cart"));
+                .orElseThrow(() -> new NotFoundException(CartResponse.PRODUCT_NOT_FOUND.name()));
 
         if (quantity == 0) {
             cartItemService.delete(cartItem);
@@ -80,15 +88,17 @@ public class CartFacade {
     }
 
     public ResponseEntity<CartDto> removeItem(Long productId) {
-        Cart cart = cartService.findById(1L)
-                .orElseThrow(() -> new NotFoundException("Cart not found"));
+        String email=getUserEmail();
+        User user=userService.getByEmail(email).orElseThrow(()->new NotFoundException(AuthResponse.USER_NOT_FOUND.name()));
+        Cart cart = cartService.findByUser(user)
+                .orElseThrow(() -> new NotFoundException(CartResponse.CART_NOT_FOUND.name()));
 
         Product product = productService.getById(productId)
-                .orElseThrow(() -> new NotFoundException("Product not found"));
+                .orElseThrow(() -> new NotFoundException(CartResponse.PRODUCT_NOT_FOUND.name()));
 
         CartItem cartItem = cartItemService
                 .findByCartAndProduct(cart, product)
-                .orElseThrow(() -> new NotFoundException("Item not in cart"));
+                .orElseThrow(() -> new NotFoundException(CartResponse.ITEM_NOT_IN_CART.name()));
 
         cartItemService.delete(cartItem);
 

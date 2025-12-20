@@ -4,5 +4,6 @@ public enum OrderStatus {
 
         CREATED,
         PAID,
-        FAILED
+        FAILED,
+    CART_IS_EMPTY,
 }

@@ -3,6 +3,7 @@ package com.example.EcommerceApplication.facade;
 import com.example.EcommerceApplication.dto.UserDto;
 import com.example.EcommerceApplication.entity.User;
 import com.example.EcommerceApplication.exception.NotFoundException;
+import com.example.EcommerceApplication.responsce.AuthResponse;
 import com.example.EcommerceApplication.security.JwtUtil;
 import com.example.EcommerceApplication.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -23,12 +24,12 @@ public class AuthFacade {
     public ResponseEntity<String> signup(UserDto userDto) {
         boolean existedUser=userService.existsByEmail(userDto.getEmail());
         if(existedUser){
-            return new ResponseEntity<>("already have an account", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(AuthResponse.INVALID_CREDENTIAL.name(), HttpStatus.BAD_REQUEST);
         }
         User newUser=User.builder().name(userDto.getName()).email(userDto.getEmail()).password(passwordEncoder.encode(userDto.getPassword()))
                 .role("ROLE_"+userDto.getRole().toUpperCase()).active(userDto.isActive()).build();
         userService.save(newUser);
-        return new ResponseEntity<>("User Created Successfully",HttpStatus.OK);
+        return new ResponseEntity<>(AuthResponse.USER_CREATED_SUCCESSFULLY.name(),HttpStatus.OK);
     }
 
     public ResponseEntity<?> login(UserDto userDto) {
@@ -36,11 +37,11 @@ public class AuthFacade {
         String password=userDto.getPassword();
         boolean existedUser=userService.existsByEmail(email);
         if(!existedUser){
-            return new  ResponseEntity<>("user not found please signup",HttpStatus.OK);
+            return new  ResponseEntity<>(AuthResponse.USER_NOT_FOUND.name(),HttpStatus.OK);
         }
-        User validateUser=userService.getByEmail(email).orElseThrow(()->new NotFoundException("invalid credential"));
+        User validateUser=userService.getByEmail(email).orElseThrow(()->new NotFoundException(AuthResponse.INVALID_CREDENTIAL.name()));
         if(!passwordEncoder.matches( password,validateUser.getPassword())){
-            return new ResponseEntity<>("invalid Credential",HttpStatus.OK);
+            return new ResponseEntity<>(AuthResponse.INVALID_CREDENTIAL.name(),HttpStatus.OK);
         }
         return new ResponseEntity<>(Map.of("token:",jwtUtil.generateToken(email,password)),HttpStatus.OK);
 
