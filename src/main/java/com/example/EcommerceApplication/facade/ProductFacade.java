@@ -5,11 +5,20 @@ import com.example.EcommerceApplication.entity.Product;
 import com.example.EcommerceApplication.exception.NotFoundException;
 import com.example.EcommerceApplication.mapper.ProductMapper;
 import com.example.EcommerceApplication.service.ProductService;
+import com.example.EcommerceApplication.utils.ExcelHelper;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.compress.utils.IOUtils;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -19,6 +28,7 @@ import java.util.stream.Collectors;
 public class ProductFacade {
     private final ProductService productService;
     private final ProductMapper productMapper;
+    private final ExcelHelper excelHelper;
     public  ResponseEntity<String> addProduct(ProductDto productDto) {
         Product newProduct=Product.builder()
                 .name(productDto.getName())
@@ -44,13 +54,10 @@ public class ProductFacade {
     }
 
     public ResponseEntity<ProductDto> getProductById(long id) {
-        Optional<Product> product=productService.getById(id);
-        if(!product.isPresent()){
-            throw new NotFoundException("Product Not found");
-        }else{
-            ProductDto productDto=productMapper.response(product.get());
+        Product product=productService.getById(id).orElseThrow(()->new NotFoundException("Product Not Found"));
+            ProductDto productDto=productMapper.response(product);
             return new ResponseEntity<>(productDto,HttpStatus.OK);
-        }
+
     }
 
     public ResponseEntity<String> updateProduct(ProductDto productDto) {
@@ -58,7 +65,7 @@ public class ProductFacade {
         if(!existingProduct.isPresent()){
             throw new NotFoundException("Product Not found");
         }else{
-            Product updatedProduct=productMapper.Transformer(productDto);
+            Product updatedProduct=productMapper.transform(productDto);
             productService.addProduct(updatedProduct);
             return new ResponseEntity<>("Updated Successfully",HttpStatus.OK);
         }
@@ -71,5 +78,21 @@ public class ProductFacade {
         productService.removeProduct(id);
         return new ResponseEntity<>("Deleted Successfully",HttpStatus.OK);
 
+    }
+    public void importExcel(MultipartFile multipartFile) throws IOException {
+        List<Product> product=excelHelper.excelToProduct(multipartFile.getInputStream());
+        productService.importExcel(product);
+    }
+
+    public void exportExcel(HttpServletResponse response) throws IOException {
+
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setHeader("Content-Disposition", "attachment; filename=products.xlsx");
+
+        List<Product> products = productService.getAll();
+
+        ByteArrayInputStream excelStream = excelHelper.productToExcel(products);
+
+        IOUtils.copy(excelStream, response.getOutputStream());
     }
 }

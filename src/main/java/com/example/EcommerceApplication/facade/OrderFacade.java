@@ -27,7 +27,7 @@ public class OrderFacade {
     private final CartService cartService;
     private final OrderService orderService;
     private final OrderMapper orderMapper;
-    String isLogged(){
+    private String isLogged(){
         Authentication auth= SecurityContextHolder.getContext().getAuthentication();
         return auth.getName();
     }
@@ -44,7 +44,7 @@ public class OrderFacade {
                 .orElseThrow(()->new NotFoundException("cart is not found"));
 
         if(cart.getItems().isEmpty()){
-            throw new RuntimeException(OrderStatus.CART_IS_EMPTY.name());
+            throw new RuntimeException(OrderStatus.CART_IS_EMPTY.name());//new except
         }
 
         Order order=Order.builder().user(user)
@@ -59,7 +59,7 @@ public class OrderFacade {
 
             Product product=cartItem.getProduct();
             if(product.getStock()< cartItem.getQuantity()){
-                throw new RuntimeException("Not Enough stock"+product.getName());
+                throw new RuntimeException("Not Enough stock"+product.getName());//custom except
             }
             product.setStock(product.getStock()- cartItem.getQuantity());
 

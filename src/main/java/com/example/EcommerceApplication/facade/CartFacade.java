@@ -28,14 +28,13 @@ public class CartFacade {
     private final ProductService productService;
     private final CartMapper cartMapper;
     private final UserService userService;
-    String getUserEmail(){
+    private String getUserEmail(){
         Authentication auth= SecurityContextHolder.getContext().getAuthentication();
         return auth.getName();
 
     }
     public ResponseEntity<CartDto> addToCart(Long productId) {
-        Authentication auth= SecurityContextHolder.getContext().getAuthentication();
-        String email=auth.getName();
+        String email=getUserEmail();
         User user=userService.getByEmail(email).orElseThrow(()->new NotFoundException(AuthResponse.USER_NOT_FOUND.name()));
         Cart cart=cartService.findByUser(user).orElseGet(()->cartService.save(Cart.builder().user(user).build()));
         Product product=productService.getById(productId)

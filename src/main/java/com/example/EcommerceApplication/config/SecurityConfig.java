@@ -22,7 +22,9 @@ public class SecurityConfig {
                 .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(request->request.requestMatchers("/auth/**","/v3/api-docs/**",
                         "/swagger-ui/**",
-                        "/swagger-ui.html").permitAll().anyRequest().authenticated())
+                        "/swagger-ui.html",
+                        "/product/import",
+                        "/product/export").permitAll().anyRequest().authenticated())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .httpBasic(Customizer.withDefaults());
         return http.build();

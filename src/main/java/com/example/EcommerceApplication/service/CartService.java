@@ -15,7 +15,7 @@ public class CartService {
     public Optional<Cart> findById(Long id){
         return cartRepository.findById(id);
     }
-    public Optional<Cart> findByUser(User user){
+    public Optional<Cart> findByUser(User user){//throw
         return cartRepository.findByUser(user);
     }
     public Cart save(Cart cart){

@@ -25,9 +25,10 @@ public class AuthFacade {
         boolean existedUser=userService.existsByEmail(userDto.getEmail());
         if(existedUser){
             return new ResponseEntity<>(AuthResponse.INVALID_CREDENTIAL.name(), HttpStatus.BAD_REQUEST);
+//            throw new
         }
         User newUser=User.builder().name(userDto.getName()).email(userDto.getEmail()).password(passwordEncoder.encode(userDto.getPassword()))
-                .role("ROLE_"+userDto.getRole().toUpperCase()).active(userDto.isActive()).build();
+                .role("ROLE_"+userDto.getRole().toUpperCase()).active(true).build();
         userService.save(newUser);
         return new ResponseEntity<>(AuthResponse.USER_CREATED_SUCCESSFULLY.name(),HttpStatus.OK);
     }
@@ -38,10 +39,12 @@ public class AuthFacade {
         boolean existedUser=userService.existsByEmail(email);
         if(!existedUser){
             return new  ResponseEntity<>(AuthResponse.USER_NOT_FOUND.name(),HttpStatus.OK);
+            //throw
         }
         User validateUser=userService.getByEmail(email).orElseThrow(()->new NotFoundException(AuthResponse.INVALID_CREDENTIAL.name()));
         if(!passwordEncoder.matches( password,validateUser.getPassword())){
-            return new ResponseEntity<>(AuthResponse.INVALID_CREDENTIAL.name(),HttpStatus.OK);
+            return new ResponseEntity<>(AuthResponse.INVALID_CREDENTIAL.name(),HttpStatus.NOT_FOUND);
+            //throw
         }
         return new ResponseEntity<>(Map.of("token:",jwtUtil.generateToken(email,password)),HttpStatus.OK);
 

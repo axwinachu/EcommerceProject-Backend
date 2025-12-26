@@ -3,12 +3,13 @@ package com.example.EcommerceApplication.controller;
 import com.example.EcommerceApplication.dto.OrderDto;
 import com.example.EcommerceApplication.dto.PlaceOrderDto;
 import com.example.EcommerceApplication.facade.OrderFacade;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+@SecurityRequirement(name = "JWT")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/orders")

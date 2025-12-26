@@ -2,10 +2,11 @@ package com.example.EcommerceApplication.controller;
 
 import com.example.EcommerceApplication.dto.CartDto;
 import com.example.EcommerceApplication.facade.CartFacade;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+@SecurityRequirement(name = "JWT")
 @RequestMapping("/cart")
 @RestController
 @RequiredArgsConstructor

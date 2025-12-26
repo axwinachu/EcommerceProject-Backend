@@ -26,4 +26,8 @@ public class ProductService {
     public void removeProduct(long id) {
         productRepository.deleteById(id);
     }
+
+    public void importExcel(List<Product> product) {
+        productRepository.saveAll(product);
+    }
 }

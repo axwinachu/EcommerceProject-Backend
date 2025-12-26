@@ -18,7 +18,7 @@ public class ProductMapper {
                 .imageUrl(product.getImageUrl())
                 .build();
     }
-    public Product Transformer(ProductDto productDto){
+    public Product transform(ProductDto productDto){
         return Product.builder()
                 .id(productDto.getId())
                 .name(productDto.getName())
