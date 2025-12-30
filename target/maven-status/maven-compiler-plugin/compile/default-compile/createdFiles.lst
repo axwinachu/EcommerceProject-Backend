@@ -1,0 +1,3 @@
+com\example\EcommerceApplication\config\RedisConfig.class
+com\example\EcommerceApplication\config\SwaggerConfig.class
+com\example\EcommerceApplication\config\SecurityConfig.class

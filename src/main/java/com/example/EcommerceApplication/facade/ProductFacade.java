@@ -4,6 +4,7 @@ import com.example.EcommerceApplication.dto.ProductDto;
 import com.example.EcommerceApplication.entity.Product;
 import com.example.EcommerceApplication.exception.NotFoundException;
 import com.example.EcommerceApplication.mapper.ProductMapper;
+import com.example.EcommerceApplication.responsce.ProductResponse;
 import com.example.EcommerceApplication.service.ProductService;
 import com.example.EcommerceApplication.utils.ExcelHelper;
 import jakarta.annotation.Resource;
@@ -38,14 +39,14 @@ public class ProductFacade {
                 .imageUrl(productDto.getImageUrl())
                 .build();
         productService.addProduct(newProduct);
-        return new ResponseEntity<>("Added Successfully",HttpStatus.OK);
+        return new ResponseEntity<>(ProductResponse.ITEM_ADDED_SUCCESSFULLY.name(),HttpStatus.OK);
 
     }
 
     public ResponseEntity<List<ProductDto>> getAllProducts() {
         List<Product> product = productService.getAll();
         if (product.isEmpty()) {
-            throw new NotFoundException("Product Not Found");
+            throw new NotFoundException(ProductResponse.PRODUCT_NOT_FOUND.name());
         } else {
             List<ProductDto> products = product.stream()
                     .map(p -> productMapper.response(p)).collect(Collectors.toList());
@@ -54,7 +55,7 @@ public class ProductFacade {
     }
 
     public ResponseEntity<ProductDto> getProductById(long id) {
-        Product product=productService.getById(id).orElseThrow(()->new NotFoundException("Product Not Found"));
+        Product product=productService.getById(id).orElseThrow(()->new NotFoundException(ProductResponse.PRODUCT_NOT_FOUND.name()));
             ProductDto productDto=productMapper.response(product);
             return new ResponseEntity<>(productDto,HttpStatus.OK);
 
@@ -63,20 +64,20 @@ public class ProductFacade {
     public ResponseEntity<String> updateProduct(ProductDto productDto) {
         Optional<Product> existingProduct=productService.getById(productDto.getId());
         if(!existingProduct.isPresent()){
-            throw new NotFoundException("Product Not found");
+            throw new NotFoundException(ProductResponse.PRODUCT_NOT_FOUND.name());
         }else{
             Product updatedProduct=productMapper.transform(productDto);
             productService.addProduct(updatedProduct);
-            return new ResponseEntity<>("Updated Successfully",HttpStatus.OK);
+            return new ResponseEntity<>(ProductResponse.PRODUCT_UPDATED_SUCCESSFULLY.name(),HttpStatus.OK);
         }
     }
     public ResponseEntity<String> deleteProductById(long id) {
         Optional<Product> existingProduct=productService.getById(id);
         if(!existingProduct.isPresent()){
-            throw new NotFoundException("Product Not found");
+            throw new NotFoundException(ProductResponse.PRODUCT_NOT_FOUND.name());
         }
         productService.removeProduct(id);
-        return new ResponseEntity<>("Deleted Successfully",HttpStatus.OK);
+        return new ResponseEntity<>(ProductResponse.DELETED_SUCCESSFULLY.name(),HttpStatus.OK);
 
     }
     public void importExcel(MultipartFile multipartFile) throws IOException {

@@ -5,6 +5,7 @@ import com.example.EcommerceApplication.entity.User;
 import com.example.EcommerceApplication.entity.Wishlist;
 import com.example.EcommerceApplication.exception.NotFoundException;
 import com.example.EcommerceApplication.mapper.WishlistMapper;
+import com.example.EcommerceApplication.responsce.UserResponse;
 import com.example.EcommerceApplication.service.UserService;
 import com.example.EcommerceApplication.service.WishlistItemService;
 import com.example.EcommerceApplication.service.WishlistService;
@@ -25,7 +26,7 @@ public class WishlistFacade {
     private User getLoggedInUser(){
         Authentication auth= SecurityContextHolder.getContext().getAuthentication();
         String email=auth.getName();
-        return userService.getByEmail(email).orElseThrow(()-> new NotFoundException("User Not Found"));
+        return userService.getByEmail(email).orElseThrow(()-> new NotFoundException(UserResponse.USER_NOT_FOUND.name()));
     }
     public ResponseEntity<WishlistDto> viewWishlist() {
        User user=getLoggedInUser();

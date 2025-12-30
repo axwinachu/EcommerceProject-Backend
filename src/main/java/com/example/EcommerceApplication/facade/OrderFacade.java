@@ -7,6 +7,7 @@ import com.example.EcommerceApplication.exception.NotFoundException;
 import com.example.EcommerceApplication.mapper.OrderMapper;
 import com.example.EcommerceApplication.responsce.CartResponse;
 import com.example.EcommerceApplication.responsce.OrderStatus;
+import com.example.EcommerceApplication.responsce.UserResponse;
 import com.example.EcommerceApplication.service.CartService;
 import com.example.EcommerceApplication.service.OrderService;
 import com.example.EcommerceApplication.service.UserService;
@@ -38,10 +39,10 @@ public class OrderFacade {
         String email=isLogged();
 
         User user=userService.getByEmail(email)
-                .orElseThrow(()->new NotFoundException("user not found"));
+                .orElseThrow(()->new NotFoundException(UserResponse.USER_NOT_FOUND.name()));
 
         Cart cart=cartService.findByUser(user)
-                .orElseThrow(()->new NotFoundException("cart is not found"));
+                .orElseThrow(()->new NotFoundException(CartResponse.CART_NOT_FOUND.name()));
 
         if(cart.getItems().isEmpty()){
             throw new RuntimeException(OrderStatus.CART_IS_EMPTY.name());//new except
@@ -81,7 +82,7 @@ public class OrderFacade {
     public ResponseEntity<List<OrderDto>> getMyOrders() {
         String email=isLogged();
         User user=userService.getByEmail(email)
-                .orElseThrow(()->new NotFoundException("User is Not Found"));
+                .orElseThrow(()->new NotFoundException(UserResponse.USER_NOT_FOUND.name()));
         List<OrderDto> orders=orderService.getOrderByUser(user).stream().map(orderMapper::toOrderDto).toList();
         return new ResponseEntity<>(orders,HttpStatus.OK);
     }
