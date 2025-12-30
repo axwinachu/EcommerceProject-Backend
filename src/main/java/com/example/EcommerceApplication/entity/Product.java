@@ -9,12 +9,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-    @Entity
+import java.io.Serializable;
+
+@Entity
     @Data
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public class Product {
+    public class Product implements Serializable {
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         private Long id;

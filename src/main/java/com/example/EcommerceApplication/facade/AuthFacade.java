@@ -39,12 +39,10 @@ public class AuthFacade {
         boolean existedUser=userService.existsByEmail(email);
         if(!existedUser){
             return new  ResponseEntity<>(AuthResponse.USER_NOT_FOUND.name(),HttpStatus.OK);
-            //throw
         }
         User validateUser=userService.getByEmail(email).orElseThrow(()->new NotFoundException(AuthResponse.INVALID_CREDENTIAL.name()));
         if(!passwordEncoder.matches( password,validateUser.getPassword())){
             return new ResponseEntity<>(AuthResponse.INVALID_CREDENTIAL.name(),HttpStatus.NOT_FOUND);
-            //throw
         }
         return new ResponseEntity<>(Map.of("token:",jwtUtil.generateToken(email,password)),HttpStatus.OK);
 

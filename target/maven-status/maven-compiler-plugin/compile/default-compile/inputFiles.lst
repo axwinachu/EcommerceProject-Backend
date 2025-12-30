@@ -1,3 +1,4 @@
+C:\Users\ceasw\OneDrive\Desktop\Ecommerce-Springboot\EcommerceApplication\src\main\java\com\example\EcommerceApplication\config\JacksonConfig.java
 C:\Users\ceasw\OneDrive\Desktop\Ecommerce-Springboot\EcommerceApplication\src\main\java\com\example\EcommerceApplication\config\RedisConfig.java
 C:\Users\ceasw\OneDrive\Desktop\Ecommerce-Springboot\EcommerceApplication\src\main\java\com\example\EcommerceApplication\config\SecurityConfig.java
 C:\Users\ceasw\OneDrive\Desktop\Ecommerce-Springboot\EcommerceApplication\src\main\java\com\example\EcommerceApplication\config\SwaggerConfig.java
@@ -26,6 +27,8 @@ C:\Users\ceasw\OneDrive\Desktop\Ecommerce-Springboot\EcommerceApplication\src\ma
 C:\Users\ceasw\OneDrive\Desktop\Ecommerce-Springboot\EcommerceApplication\src\main\java\com\example\EcommerceApplication\entity\WishlistItem.java
 C:\Users\ceasw\OneDrive\Desktop\Ecommerce-Springboot\EcommerceApplication\src\main\java\com\example\EcommerceApplication\exception\GlobalExceptionHandler.java
 C:\Users\ceasw\OneDrive\Desktop\Ecommerce-Springboot\EcommerceApplication\src\main\java\com\example\EcommerceApplication\exception\NotFoundException.java
+C:\Users\ceasw\OneDrive\Desktop\Ecommerce-Springboot\EcommerceApplication\src\main\java\com\example\EcommerceApplication\exception\ResourceNotFound.java
+C:\Users\ceasw\OneDrive\Desktop\Ecommerce-Springboot\EcommerceApplication\src\main\java\com\example\EcommerceApplication\exception\UserNotFoundException.java
 C:\Users\ceasw\OneDrive\Desktop\Ecommerce-Springboot\EcommerceApplication\src\main\java\com\example\EcommerceApplication\facade\AuthFacade.java
 C:\Users\ceasw\OneDrive\Desktop\Ecommerce-Springboot\EcommerceApplication\src\main\java\com\example\EcommerceApplication\facade\CartFacade.java
 C:\Users\ceasw\OneDrive\Desktop\Ecommerce-Springboot\EcommerceApplication\src\main\java\com\example\EcommerceApplication\facade\OrderFacade.java

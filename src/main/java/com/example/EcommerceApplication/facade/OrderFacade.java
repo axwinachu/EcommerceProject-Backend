@@ -41,7 +41,7 @@ public class OrderFacade {
         User user=userService.getByEmail(email)
                 .orElseThrow(()->new NotFoundException(UserResponse.USER_NOT_FOUND.name()));
 
-        Cart cart=cartService.findByUser(user)
+        Cart cart=cartService.findByUserWithItems(user)
                 .orElseThrow(()->new NotFoundException(CartResponse.CART_NOT_FOUND.name()));
 
         if(cart.getItems().isEmpty()){

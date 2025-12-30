@@ -1,34 +1,52 @@
 services:
+
   mysql:
     image: mysql:8.0
+    container_name: ecommerce-mysql
+    restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: testing
       MYSQL_USER: aswin
       MYSQL_PASSWORD: 2465
-      MYSQL_DATABASE: testing
     ports:
       - "3307:3306"
     networks:
-      student-network:
+      ecommerce:
+        aliases:
+          - mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      retries: 10
+      timeout: 5s
+
   redis:
     image: redis:7
-    container_name: redis
+    container_name: ecommerce-redis
+    restart: always
     ports:
       - "6379:6379"
-    restart: always
+    networks:
+      ecommerce:
+        aliases:
+          - redis
+
   app:
-    build:
-      context: .
+    build: .
+    container_name: ecommerce-backend
+    restart: always
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
     ports:
       - "8080:8080"
-    depends_on:
-      - mysql
-      - redis
     networks:
-      student-network:
-
+      ecommerce:
+        aliases:
+          - app
 
 networks:
-  student-network:
-
-
+  ecommerce:

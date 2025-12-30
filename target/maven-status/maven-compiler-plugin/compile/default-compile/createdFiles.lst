@@ -1,3 +1,6 @@
+com\example\EcommerceApplication\exception\ResourceNotFound.class
 com\example\EcommerceApplication\config\RedisConfig.class
+com\example\EcommerceApplication\config\JacksonConfig.class
 com\example\EcommerceApplication\config\SwaggerConfig.class
+com\example\EcommerceApplication\exception\UserNotFoundException.class
 com\example\EcommerceApplication\config\SecurityConfig.class

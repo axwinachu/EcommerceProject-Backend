@@ -13,6 +13,7 @@ import com.example.EcommerceApplication.service.CartItemService;
 import com.example.EcommerceApplication.service.CartService;
 import com.example.EcommerceApplication.service.ProductService;
 import com.example.EcommerceApplication.service.UserService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,10 +34,11 @@ public class CartFacade {
         return auth.getName();
 
     }
+    @Transactional
     public ResponseEntity<CartDto> addToCart(Long productId) {
         String email=getUserEmail();
         User user=userService.getByEmail(email).orElseThrow(()->new NotFoundException(AuthResponse.USER_NOT_FOUND.name()));
-        Cart cart=cartService.findByUser(user).orElseGet(()->cartService.save(Cart.builder().user(user).build()));
+        Cart cart=cartService.findByUserWithItems(user).orElseGet(()->cartService.save(Cart.builder().user(user).build()));
         Product product=productService.getById(productId)
                 .orElseThrow(()->new NotFoundException(CartResponse.PRODUCT_NOT_FOUND.name()));
 
@@ -52,7 +54,7 @@ public class CartFacade {
         Authentication auth= SecurityContextHolder.getContext().getAuthentication();
         String email=auth.getName();
         User user=userService.getByEmail(email).orElseThrow(()->new NotFoundException(AuthResponse.USER_NOT_FOUND.name()));
-        Cart cart = cartService.findByUser(user)
+        Cart cart = cartService.findByUserWithItems(user)
                 .orElseGet(() -> cartService.save(Cart.builder().user(user).build()));
         return new ResponseEntity<>(cartMapper.toCartDto(cart), HttpStatus.OK);
     }
@@ -63,7 +65,7 @@ public class CartFacade {
         }
         String email=getUserEmail();
         User user=userService.getByEmail(email).orElseThrow(()->new NotFoundException(AuthResponse.USER_NOT_FOUND.name()));
-        Cart cart = cartService.findByUser(user)
+        Cart cart = cartService.findByUserWithItems(user)
                 .orElseThrow(() -> new NotFoundException(CartResponse.CART_NOT_FOUND.name()));
 
         Product product = productService.getById(productId)
@@ -89,7 +91,7 @@ public class CartFacade {
     public ResponseEntity<CartDto> removeItem(Long productId) {
         String email=getUserEmail();
         User user=userService.getByEmail(email).orElseThrow(()->new NotFoundException(AuthResponse.USER_NOT_FOUND.name()));
-        Cart cart = cartService.findByUser(user)
+        Cart cart = cartService.findByUserWithItems(user)
                 .orElseThrow(() -> new NotFoundException(CartResponse.CART_NOT_FOUND.name()));
 
         Product product = productService.getById(productId)

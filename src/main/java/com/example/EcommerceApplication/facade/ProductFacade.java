@@ -44,6 +44,7 @@ public class ProductFacade {
     }
 
     public ResponseEntity<List<ProductDto>> getAllProducts() {
+
         List<Product> product = productService.getAll();
         if (product.isEmpty()) {
             throw new NotFoundException(ProductResponse.PRODUCT_NOT_FOUND.name());
