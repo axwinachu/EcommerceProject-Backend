@@ -35,8 +35,10 @@ public class Order {
 
     @OneToMany(
             mappedBy = "order",
-            cascade = CascadeType.ALL
+            cascade = CascadeType.ALL,
+            fetch = FetchType.EAGER
     )
+    @Builder.Default
     private List<OrderItem> item=new ArrayList<>();
 
 

@@ -27,8 +27,10 @@ public class Wishlist {
     @OneToMany(
             mappedBy = "wishlist",
             cascade = CascadeType.ALL,
-            orphanRemoval = true
+            orphanRemoval = true,
+            fetch = FetchType.EAGER
     )
+    @Builder.Default
     private List<WishlistItem> items=new ArrayList<>();
 
 }

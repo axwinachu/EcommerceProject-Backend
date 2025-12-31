@@ -1,9 +1,12 @@
 package com.example.EcommerceApplication.facade;
 
+import com.example.EcommerceApplication.dto.AuthResponseDto;
 import com.example.EcommerceApplication.dto.UserDto;
 import com.example.EcommerceApplication.entity.User;
 import com.example.EcommerceApplication.exception.NotFoundException;
+import com.example.EcommerceApplication.exception.UserNotFoundException;
 import com.example.EcommerceApplication.responsce.AuthResponse;
+import com.example.EcommerceApplication.responsce.UserResponse;
 import com.example.EcommerceApplication.security.JwtUtil;
 import com.example.EcommerceApplication.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -33,18 +36,20 @@ public class AuthFacade {
         return new ResponseEntity<>(AuthResponse.USER_CREATED_SUCCESSFULLY.name(),HttpStatus.OK);
     }
 
-    public ResponseEntity<?> login(UserDto userDto) {
+    public ResponseEntity<AuthResponseDto> login(UserDto userDto) {
         String email= userDto.getEmail();
         String password=userDto.getPassword();
         boolean existedUser=userService.existsByEmail(email);
         if(!existedUser){
-            return new  ResponseEntity<>(AuthResponse.USER_NOT_FOUND.name(),HttpStatus.OK);
+            throw new UserNotFoundException(AuthResponse.USER_NOT_FOUND.name());
         }
         User validateUser=userService.getByEmail(email).orElseThrow(()->new NotFoundException(AuthResponse.INVALID_CREDENTIAL.name()));
         if(!passwordEncoder.matches( password,validateUser.getPassword())){
-            return new ResponseEntity<>(AuthResponse.INVALID_CREDENTIAL.name(),HttpStatus.NOT_FOUND);
+            throw  new UserNotFoundException(AuthResponse.INVALID_CREDENTIAL.name());
         }
-        return new ResponseEntity<>(Map.of("token:",jwtUtil.generateToken(email,password)),HttpStatus.OK);
+       String token=jwtUtil.generateToken(email,password);
+        AuthResponseDto responseDto=AuthResponseDto.builder().token(token).build();
+        return new ResponseEntity<>(responseDto,HttpStatus.OK);
 
     }
 }

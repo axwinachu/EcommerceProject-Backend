@@ -1,5 +1,6 @@
 package com.example.EcommerceApplication.controller;
 
+import com.example.EcommerceApplication.dto.AuthResponseDto;
 import com.example.EcommerceApplication.dto.UserDto;
 import com.example.EcommerceApplication.facade.AuthFacade;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +21,7 @@ public class AuthController {
         return authFacade.signup(userDto);
     }
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody UserDto userDto){
+    public ResponseEntity<AuthResponseDto> login(@RequestBody UserDto userDto){
         return authFacade.login(userDto);
     }
 }
