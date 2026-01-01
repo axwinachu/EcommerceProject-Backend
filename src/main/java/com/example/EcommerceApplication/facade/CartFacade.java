@@ -32,10 +32,9 @@ public class CartFacade {
     private String getUserEmail(){
         Authentication auth= SecurityContextHolder.getContext().getAuthentication();
         return auth.getName();
-
     }
     @Transactional
-    public ResponseEntity<CartDto> addToCart(Long productId) {
+    public CartDto addToCart(Long productId) {
         String email=getUserEmail();
         User user=userService.getByEmail(email).orElseThrow(()->new NotFoundException(AuthResponse.USER_NOT_FOUND.name()));
         Cart cart=cartService.findByUserWithItems(user).orElseGet(()->cartService.save(Cart.builder().user(user).build()));
@@ -47,19 +46,17 @@ public class CartFacade {
         
         cartItem.setQuantity(cartItem.getQuantity()+1);
         cartItemService.save(cartItem);
-        return new ResponseEntity<>(cartMapper.toCartDto(cart), HttpStatus.OK);
+        return cartMapper.toCartDto(cart);
     }
-
-    public ResponseEntity<CartDto> viewCart() {
+    public CartDto viewCart() {
         Authentication auth= SecurityContextHolder.getContext().getAuthentication();
         String email=auth.getName();
         User user=userService.getByEmail(email).orElseThrow(()->new NotFoundException(AuthResponse.USER_NOT_FOUND.name()));
         Cart cart = cartService.findByUserWithItems(user)
                 .orElseGet(() -> cartService.save(Cart.builder().user(user).build()));
-        return new ResponseEntity<>(cartMapper.toCartDto(cart), HttpStatus.OK);
+        return cartMapper.toCartDto(cart);
     }
-
-    public ResponseEntity<CartDto> updateQuantity(Long productId, int quantity) {
+    public CartDto updateQuantity(Long productId, int quantity) {
         if (quantity < 0) {
             throw new IllegalArgumentException(CartResponse.QUANTITY_CANNOT_BE_NEGATIVE.name());
         }
@@ -67,46 +64,31 @@ public class CartFacade {
         User user=userService.getByEmail(email).orElseThrow(()->new NotFoundException(AuthResponse.USER_NOT_FOUND.name()));
         Cart cart = cartService.findByUserWithItems(user)
                 .orElseThrow(() -> new NotFoundException(CartResponse.CART_NOT_FOUND.name()));
-
         Product product = productService.getById(productId)
                 .orElseThrow(() -> new NotFoundException(CartResponse.PRODUCT_NOT_FOUND.name()));
-
         CartItem cartItem = cartItemService
                 .findByCartAndProduct(cart, product)
                 .orElseThrow(() -> new NotFoundException(CartResponse.PRODUCT_NOT_FOUND.name()));
-
         if (quantity == 0) {
             cartItemService.delete(cartItem);
         } else {
             cartItem.setQuantity(quantity);
             cartItemService.save(cartItem);
         }
-
-        return new ResponseEntity<>(
-                cartMapper.toCartDto(cart),
-                HttpStatus.OK
-        );
+        return cartMapper.toCartDto(cart);
     }
-
-    public ResponseEntity<CartDto> removeItem(Long productId) {
+    public CartDto removeItem(Long productId) {
         String email=getUserEmail();
         User user=userService.getByEmail(email).orElseThrow(()->new NotFoundException(AuthResponse.USER_NOT_FOUND.name()));
         Cart cart = cartService.findByUserWithItems(user)
                 .orElseThrow(() -> new NotFoundException(CartResponse.CART_NOT_FOUND.name()));
-
         Product product = productService.getById(productId)
                 .orElseThrow(() -> new NotFoundException(CartResponse.PRODUCT_NOT_FOUND.name()));
-
         CartItem cartItem = cartItemService
                 .findByCartAndProduct(cart, product)
                 .orElseThrow(() -> new NotFoundException(CartResponse.ITEM_NOT_IN_CART.name()));
-
         cartItemService.delete(cartItem);
-
-        return new ResponseEntity<>(
-                cartMapper.toCartDto(cart),
-                HttpStatus.OK
-        );
+        return cartMapper.toCartDto(cart);
     }
 
 }

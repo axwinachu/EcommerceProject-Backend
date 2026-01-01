@@ -43,11 +43,9 @@ public class ProductFacade {
                 .build();
         productService.addProduct(newProduct);
         return new ResponseEntity<>(ProductResponse.ITEM_ADDED_SUCCESSFULLY.name(),HttpStatus.OK);
-
     }
     @Cacheable("products")
     public List<ProductDto> getAllProducts() {
-
         List<Product> product = productService.getAll();
         if (product.isEmpty()) {
             throw new NotFoundException(ProductResponse.PRODUCT_NOT_FOUND.name());
@@ -69,14 +67,12 @@ public class ProductFacade {
             Product updatedProduct=productMapper.transform(productDto);
             productService.addProduct(updatedProduct);
             return ProductResponse.PRODUCT_UPDATED_SUCCESSFULLY.name();
-
     }
     @CacheEvict(value={"products","product"}, allEntries=true)
     public String deleteProductById(long id) {
         productService.getById(id).orElseThrow(()->new NotFoundException(ProductResponse.PRODUCT_NOT_FOUND.name()));
         productService.removeProduct(id);
         return ProductResponse.DELETED_SUCCESSFULLY.name();
-
     }
     public void importExcel(MultipartFile multipartFile) throws IOException {
         List<Product> product=excelHelper.excelToProduct(multipartFile.getInputStream());

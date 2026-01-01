@@ -13,23 +13,23 @@ import org.springframework.web.bind.annotation.*;
 public class CartController {
     private final CartFacade cartFacade;
     @PostMapping("/add/{productId}")
-    public ResponseEntity<CartDto> addToCart(@PathVariable Long productId){
+    public CartDto addToCart(@PathVariable Long productId){
          return cartFacade.addToCart(productId);
     }
     @GetMapping("/")
-    public ResponseEntity<CartDto> viewCart() {
+    public CartDto viewCart() {
 
         return cartFacade.viewCart();
     }
     @PutMapping("/update/{productId}")
-    public ResponseEntity<CartDto> updateQuantity(
+    public CartDto updateQuantity(
             @PathVariable Long productId,
             @RequestParam int quantity) {
 
         return cartFacade.updateQuantity(productId, quantity);
     }
     @DeleteMapping("/remove/{productId}")
-    public ResponseEntity<CartDto> removeItem(
+    public CartDto removeItem(
             @PathVariable Long productId) {
 
         return cartFacade.removeItem(productId);

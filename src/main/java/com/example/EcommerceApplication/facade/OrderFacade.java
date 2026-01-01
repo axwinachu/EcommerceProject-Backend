@@ -33,31 +33,23 @@ public class OrderFacade {
         return auth.getName();
     }
     @Transactional
-    public ResponseEntity<OrderDto> placeOrder(PlaceOrderDto placeOrderDto) {
-
-
+    public OrderDto placeOrder(PlaceOrderDto placeOrderDto) {
         String email=isLogged();
-
         User user=userService.getByEmail(email)
                 .orElseThrow(()->new NotFoundException(UserResponse.USER_NOT_FOUND.name()));
-
         Cart cart=cartService.findByUserWithItems(user)
                 .orElseThrow(()->new NotFoundException(CartResponse.CART_NOT_FOUND.name()));
-
         if(cart.getItems().isEmpty()){
             throw new RuntimeException(OrderStatus.CART_IS_EMPTY.name());//new except
         }
-
         Order order=Order.builder().user(user)
                 .address(placeOrderDto.getAddress())
                 .city(placeOrderDto.getCity())
                 .pincode(placeOrderDto.getPincode())
                 .orderStatus(OrderStatus.CREATED)
                 .build();
-
         double total=0;
         for(CartItem cartItem: cart.getItems()){
-
             Product product=cartItem.getProduct();
             if(product.getStock()< cartItem.getQuantity()){
                 throw new RuntimeException("Not Enough stock"+product.getName());//custom except
@@ -76,14 +68,13 @@ public class OrderFacade {
         order.setTotalAmount(total);
         Order saveOrder=orderService.save(order);
         cart.getItems().clear();
-        return new ResponseEntity<>(orderMapper.toOrderDto(saveOrder), HttpStatus.OK);
+        return orderMapper.toOrderDto(saveOrder);
     }
-
-    public ResponseEntity<List<OrderDto>> getMyOrders() {
+    public List<OrderDto> getMyOrders() {
         String email=isLogged();
         User user=userService.getByEmail(email)
                 .orElseThrow(()->new NotFoundException(UserResponse.USER_NOT_FOUND.name()));
         List<OrderDto> orders=orderService.getOrderByUser(user).stream().map(orderMapper::toOrderDto).toList();
-        return new ResponseEntity<>(orders,HttpStatus.OK);
+        return orders;
     }
 }

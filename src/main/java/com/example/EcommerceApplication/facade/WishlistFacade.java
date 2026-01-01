@@ -28,10 +28,10 @@ public class WishlistFacade {
         String email=auth.getName();
         return userService.getByEmail(email).orElseThrow(()-> new NotFoundException(UserResponse.USER_NOT_FOUND.name()));
     }
-    public ResponseEntity<WishlistDto> viewWishlist() {
+    public WishlistDto viewWishlist() {
        User user=getLoggedInUser();
         Wishlist wishlist=wishlistService.findByUser(user)
                 .orElseGet(()->wishlistService.save(Wishlist.builder().user(user).build()));
-        return new ResponseEntity<>(wishlistMapper.toWishlistDto(wishlist), HttpStatus.OK);
+        return wishlistMapper.toWishlistDto(wishlist);
     }
 }

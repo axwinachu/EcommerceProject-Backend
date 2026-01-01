@@ -17,12 +17,12 @@ public class OrderController {
     private final OrderFacade orderFacade;
 
     @PostMapping("/place")
-    public ResponseEntity<OrderDto> placeOrder(@RequestBody PlaceOrderDto placeOrderDto){
+    public OrderDto placeOrder(@RequestBody PlaceOrderDto placeOrderDto){
         return orderFacade.placeOrder(placeOrderDto);
     }
 
     @GetMapping("/my")
-    public ResponseEntity<List<OrderDto>> getMyOrders(){
+    public List<OrderDto> getMyOrders(){
         return orderFacade.getMyOrders();
     }
 }

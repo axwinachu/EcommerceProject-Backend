@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class WishlistController {
     private final WishlistFacade wishlistFacade;
     @GetMapping("/")
-    public ResponseEntity<WishlistDto> viewWishlist(){
+    public WishlistDto viewWishlist(){
        return wishlistFacade.viewWishlist();
     }
 }
