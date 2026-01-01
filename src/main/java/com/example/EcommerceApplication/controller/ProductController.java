@@ -23,16 +23,16 @@ import java.util.List;
 public class ProductController {
     private final ProductFacade productFacade;
     @GetMapping("/all")
-    public ResponseEntity<List<ProductDto>> getAllProducts(){
+    public List<ProductDto> getAllProducts(){
         return productFacade.getAllProducts();
     }
     @GetMapping("/{id}")
-    public  ResponseEntity<ProductDto> getProductById(@PathVariable long id){
+    public  ProductDto getProductById(@PathVariable long id){
         return productFacade.getProductById(id);
     }
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/update")
-    public ResponseEntity<String> updateProduct(@RequestBody ProductDto productDto){
+    public String updateProduct(@RequestBody ProductDto productDto){
         return productFacade.updateProduct(productDto);
     }
     @PreAuthorize("hasRole('ADMIN')")
@@ -42,7 +42,7 @@ public class ProductController {
     }
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("remove/{id}")
-    public ResponseEntity<String> deleteProduct(@PathVariable long id){
+    public String deleteProduct(@PathVariable long id){
         return productFacade.deleteProductById(id);
     }
     @PostMapping(value = "/import",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

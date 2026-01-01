@@ -11,6 +11,8 @@ import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.compress.utils.IOUtils;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -30,6 +32,7 @@ public class ProductFacade {
     private final ProductService productService;
     private final ProductMapper productMapper;
     private final ExcelHelper excelHelper;
+    @CacheEvict(value={"products","product"}, allEntries=true)
     public  ResponseEntity<String> addProduct(ProductDto productDto) {
         Product newProduct=Product.builder()
                 .name(productDto.getName())
@@ -42,8 +45,8 @@ public class ProductFacade {
         return new ResponseEntity<>(ProductResponse.ITEM_ADDED_SUCCESSFULLY.name(),HttpStatus.OK);
 
     }
-
-    public ResponseEntity<List<ProductDto>> getAllProducts() {
+    @Cacheable("products")
+    public List<ProductDto> getAllProducts() {
 
         List<Product> product = productService.getAll();
         if (product.isEmpty()) {
@@ -51,50 +54,39 @@ public class ProductFacade {
         } else {
             List<ProductDto> products = product.stream()
                     .map(p -> productMapper.response(p)).collect(Collectors.toList());
-            return new ResponseEntity<>(products, HttpStatus.OK);
+            return products;
         }
     }
-
-    public ResponseEntity<ProductDto> getProductById(long id) {
+    @Cacheable(value = "product",key = "#id")
+    public ProductDto getProductById(long id) {
         Product product=productService.getById(id).orElseThrow(()->new NotFoundException(ProductResponse.PRODUCT_NOT_FOUND.name()));
             ProductDto productDto=productMapper.response(product);
-            return new ResponseEntity<>(productDto,HttpStatus.OK);
-
+            return productDto;
     }
-
-    public ResponseEntity<String> updateProduct(ProductDto productDto) {
-        Optional<Product> existingProduct=productService.getById(productDto.getId());
-        if(!existingProduct.isPresent()){
-            throw new NotFoundException(ProductResponse.PRODUCT_NOT_FOUND.name());
-        }else{
+    @CacheEvict(value={"products","product"}, allEntries=true)
+    public String updateProduct(ProductDto productDto) {
+            productService.getById(productDto.getId()).orElseThrow(()->new NotFoundException(ProductResponse.PRODUCT_NOT_FOUND.name()));
             Product updatedProduct=productMapper.transform(productDto);
             productService.addProduct(updatedProduct);
-            return new ResponseEntity<>(ProductResponse.PRODUCT_UPDATED_SUCCESSFULLY.name(),HttpStatus.OK);
-        }
+            return ProductResponse.PRODUCT_UPDATED_SUCCESSFULLY.name();
+
     }
-    public ResponseEntity<String> deleteProductById(long id) {
-        Optional<Product> existingProduct=productService.getById(id);
-        if(!existingProduct.isPresent()){
-            throw new NotFoundException(ProductResponse.PRODUCT_NOT_FOUND.name());
-        }
+    @CacheEvict(value={"products","product"}, allEntries=true)
+    public String deleteProductById(long id) {
+        productService.getById(id).orElseThrow(()->new NotFoundException(ProductResponse.PRODUCT_NOT_FOUND.name()));
         productService.removeProduct(id);
-        return new ResponseEntity<>(ProductResponse.DELETED_SUCCESSFULLY.name(),HttpStatus.OK);
+        return ProductResponse.DELETED_SUCCESSFULLY.name();
 
     }
     public void importExcel(MultipartFile multipartFile) throws IOException {
         List<Product> product=excelHelper.excelToProduct(multipartFile.getInputStream());
         productService.importExcel(product);
     }
-
     public void exportExcel(HttpServletResponse response) throws IOException {
-
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         response.setHeader("Content-Disposition", "attachment; filename=products.xlsx");
-
         List<Product> products = productService.getAll();
-
         ByteArrayInputStream excelStream = excelHelper.productToExcel(products);
-
         IOUtils.copy(excelStream, response.getOutputStream());
     }
 }

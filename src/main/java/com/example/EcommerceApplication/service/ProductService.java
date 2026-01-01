@@ -14,21 +14,21 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ProductService {
     private final ProductRepository productRepository;
-    @Cacheable("products")
+
     public List<Product> getAll() {
         System.out.println("db hits");
        return productRepository.findAll();
     }
-    @Cacheable(value = "product",key = "#id")
+
     public Optional<Product> getById(long id){
         System.out.println("db hits");
         return productRepository.findById(id);
     }
-    @CacheEvict(value={"products","product"}, allEntries=true)
+
     public void addProduct(Product newProduct) {
         productRepository.save(newProduct);
     }
-    @CacheEvict(value={"products","product"}, allEntries=true)
+
     public void removeProduct(long id) {
         productRepository.deleteById(id);
     }
