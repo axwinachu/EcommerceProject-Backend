@@ -30,17 +30,15 @@ public class ProductController {
     public  ProductDto getProductById(@PathVariable long id){
         return productFacade.getProductById(id);
     }
-    @PreAuthorize("hasRole('ADMIN')")
+
     @PutMapping("/update")
     public String updateProduct(@RequestBody ProductDto productDto){
         return productFacade.updateProduct(productDto);
     }
-    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/addProduct")
     public ResponseEntity<String> addNewProduct(@RequestBody ProductDto productDto){
         return productFacade.addProduct(productDto);
     }
-    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("remove/{id}")
     public String deleteProduct(@PathVariable long id){
         return productFacade.deleteProductById(id);

@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,6 +41,18 @@ public class Order {
     )
     @Builder.Default
     private List<OrderItem> item=new ArrayList<>();
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    @PrePersist
+    public void whenOrderIsCreated() {
+        this.createdAt = LocalDateTime.now();
+        this.orderStatus = OrderStatus.CREATED;
+    }
+    @PreUpdate
+    public void whenOrderIsUpdated() {
+        this.updatedAt = LocalDateTime.now().withNano(0);
+    }
 
 
 }

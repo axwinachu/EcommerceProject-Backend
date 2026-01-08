@@ -58,20 +58,20 @@ public class ProductFacade {
     }
     @Cacheable(value = "product",key = "#id")
     public ProductDto getProductById(long id) {
-        Product product=productService.getById(id).orElseThrow(()->new NotFoundException(ProductResponse.PRODUCT_NOT_FOUND.name()));
+        Product product=productService.getById(id);
             ProductDto productDto=productMapper.response(product);
             return productDto;
     }
     @CacheEvict(value={"products","product"}, allEntries=true)
     public String updateProduct(ProductDto productDto) {
-            productService.getById(productDto.getId()).orElseThrow(()->new NotFoundException(ProductResponse.PRODUCT_NOT_FOUND.name()));
+            productService.getById(productDto.getId());
             Product updatedProduct=productMapper.transform(productDto);
             productService.addProduct(updatedProduct);
             return ProductResponse.PRODUCT_UPDATED_SUCCESSFULLY.name();
     }
     @CacheEvict(value={"products","product"}, allEntries=true)
     public String deleteProductById(long id) {
-        productService.getById(id).orElseThrow(()->new NotFoundException(ProductResponse.PRODUCT_NOT_FOUND.name()));
+        productService.getById(id);
         productService.removeProduct(id);
         return ProductResponse.DELETED_SUCCESSFULLY.name();
     }

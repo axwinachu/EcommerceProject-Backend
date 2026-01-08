@@ -1,7 +1,9 @@
 package com.example.EcommerceApplication.service;
 
 import com.example.EcommerceApplication.entity.Product;
+import com.example.EcommerceApplication.exception.ProductNotFoundException;
 import com.example.EcommerceApplication.repository.ProductRepository;
+import com.example.EcommerceApplication.responsce.ProductResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -20,9 +22,9 @@ public class ProductService {
        return productRepository.findAll();
     }
 
-    public Optional<Product> getById(long id){
+    public Product getById(long id){
         System.out.println("db hits");
-        return productRepository.findById(id);
+        return productRepository.findById(id).orElseThrow(()->new ProductNotFoundException(ProductResponse.PRODUCT_NOT_FOUND.name()));
     }
 
     public void addProduct(Product newProduct) {

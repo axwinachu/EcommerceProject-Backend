@@ -35,8 +35,7 @@ public class OrderFacade {
     @Transactional
     public OrderDto placeOrder(PlaceOrderDto placeOrderDto) {
         String email=isLogged();
-        User user=userService.getByEmail(email)
-                .orElseThrow(()->new NotFoundException(UserResponse.USER_NOT_FOUND.name()));
+        User user=userService.getByEmail(email);
         Cart cart=cartService.findByUserWithItems(user)
                 .orElseThrow(()->new NotFoundException(CartResponse.CART_NOT_FOUND.name()));
         if(cart.getItems().isEmpty()){
@@ -72,8 +71,7 @@ public class OrderFacade {
     }
     public List<OrderDto> getMyOrders() {
         String email=isLogged();
-        User user=userService.getByEmail(email)
-                .orElseThrow(()->new NotFoundException(UserResponse.USER_NOT_FOUND.name()));
+        User user=userService.getByEmail(email);
         List<OrderDto> orders=orderService.getOrderByUser(user).stream().map(orderMapper::toOrderDto).toList();
         return orders;
     }

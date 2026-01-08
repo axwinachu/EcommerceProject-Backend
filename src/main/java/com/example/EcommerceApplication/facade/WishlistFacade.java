@@ -26,7 +26,7 @@ public class WishlistFacade {
     private User getLoggedInUser(){
         Authentication auth= SecurityContextHolder.getContext().getAuthentication();
         String email=auth.getName();
-        return userService.getByEmail(email).orElseThrow(()-> new NotFoundException(UserResponse.USER_NOT_FOUND.name()));
+        return userService.getByEmail(email);
     }
     public WishlistDto viewWishlist() {
        User user=getLoggedInUser();

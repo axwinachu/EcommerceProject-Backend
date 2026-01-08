@@ -18,6 +18,6 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
         LEFT JOIN FETCH i.product
         WHERE c.user = :user
     """)
-    Optional<Cart> findByUserWithItems(User user);
+    Optional<Cart>  findByUserWithItems(User user);
 }
 
